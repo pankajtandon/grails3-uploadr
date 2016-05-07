@@ -64,17 +64,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
 grailsPublish {
-    user = 'user'
-    key = 'key'
-    githubSlug = 'https://github.com/pankajtandon'
-    license {
-        name = 'Apache-2.0'
-    }
+    githubSlug = 'pankajtandon/grails3-uploadr'
+    license = ['Apache-2.0']
     title = "html5 file uploadr for Grails3"
     desc = "Plugin to upload multiple files from a web page. Uses HTML5 and CSS3"
     developers = [pankajtandon:"Pankaj Tandon"]
-    portalUser = ""
-    portalPassword = ""    
 }
 
 
