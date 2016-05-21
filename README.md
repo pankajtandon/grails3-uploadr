@@ -56,11 +56,22 @@ Then in a gsp where the uploadr needs to be installed:
 </pre>
 
 
-## Image
+## Images
 
-When configured, here is how a single file upload looks:
+When your gsp is configured with a tag like so:
+ 
+`
+<uploadr:add name="aFileToUpload.png" path="/somewhereOnYourFS" maxSize="52428800" /> 
+`
+ 
+Here is how a single file upload looks:
+
+![uploadImage](uploadbefore.png)
+
+and after upload...
 
 ![uploadImage](upload.png)
+
 ## ToDo
 
 - i18n is still not working correctly, so all messages have been hardcoded in English.
