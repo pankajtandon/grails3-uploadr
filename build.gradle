@@ -11,7 +11,7 @@ buildscript {
     }
 }
 
-version "3.0" //lock-step with Grails 3.x
+version "3.0.1" //lock-step with Grails 3.x
 group "com.nayidisha.grails.uploadr"
 
 apply plugin:"eclipse"
