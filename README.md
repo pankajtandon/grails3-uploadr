@@ -9,14 +9,7 @@ Grails 3 is based on Spring-Boot and plugins written pre-Grails 3 have to be "re
 This is an upgrade to grails 3.x of the excellent plugin written by Dustin Clark [here](https://github.com/dustindclark/grails-uploadr/blob/master/README.md)
 
 ## Usage
-
-This plugin is still not on bintray.
-So, in the meanwhile, download this project and issue:
-<pre>
-grails install
-</pre>
-
-Then in the project that you would like to use the uploadr plugin, include the following in it's build.gradle.
+In the project that you would like to use the uploadr plugin, include the following in it's build.gradle.
 
 <pre>
 buildscript {
@@ -50,7 +43,6 @@ Then in a gsp where the uploadr needs to be installed:
     &lt;asset:javascript src="uploadr.demo.manifest.js"/&gt;
     &lt;asset:stylesheet href="uploadr.manifest.css"/&gt;
     &lt;asset:stylesheet href="uploadr.demo.manifest.css"/&gt;
-    &lt;asset:stylesheet href="bootstrap.manifest.css"/&gt;
     ...
 &lt;/head&gt;
 &lt;body&gt;
