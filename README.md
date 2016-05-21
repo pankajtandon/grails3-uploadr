@@ -48,7 +48,7 @@ Then in a gsp where the uploadr needs to be installed:
 &lt;body&gt;
     ...
     &lt;uploadr:demo/&gt;
-    ...
+    ... 
 &lt;/body&gt;
 &lt;/html&gt;
 
@@ -56,6 +56,11 @@ Then in a gsp where the uploadr needs to be installed:
 </pre>
 
 
+## Image
+
+When configured, here is how a single file upload looks:
+
+![uploadImage](upload.png)
 ## ToDo
 
 - i18n is still not working correctly, so all messages have been hardcoded in English.
