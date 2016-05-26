@@ -24,11 +24,11 @@
 // this rule and defining them in here...
 
 def downloads = grailsApplication.config.uploadr.defaultUploadPath
-def path1 = new File("${downloads}/myFirstUploadr")
-def path2 = new File("${downloads}/mySecondUploadr")
-def path3 = new File("${downloads}/myThirdUploadr")
-def path4 = new File("${downloads}/myFourthUploadr")
-def path5 = new File("${downloads}/myFifthUploadr")
+def path1 = new File(downloads, "myFirstUploadr")
+def path2 = new File(downloads, "mySecondUploadr")
+def path3 = new File(downloads, "myThirdUploadr")
+def path4 = new File(downloads, "myFourthUploadr")
+def path5 = new File(downloads, "myFifthUploadr")
 %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">

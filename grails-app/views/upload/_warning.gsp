@@ -15,7 +15,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-def msie = request.getHeader('user-agent').contains("MSIE")
 %>
 <div class="warning">
 	<div class="message">
@@ -38,7 +37,7 @@ def msie = request.getHeader('user-agent').contains("MSIE")
 			</div>
 		</div>
 	</div>
-<g:if test="${msie}">
+<g:if test="${request.getHeader('user-agent').contains("MSIE")}">
 	<div class="message">
 		upgrade to <a href="http://ie.microsoft.com/testdrive/" target="_ie10">Internet Explorer 10</a> or install the<br/>
 		<a href="http://www.google.com/chromeframe" target="_chromeframe">Google Chrome Frame</a> browser plugin for Internet Explorer:
