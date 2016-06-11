@@ -192,7 +192,7 @@ class UploadController {
         URLDecoder.decode params[name], 'UTF-8'
     }
 
-    private header(String name) {
+    public header(String name) {
         URLDecoder.decode request.getHeader(name), 'UTF-8'
     }
 }
