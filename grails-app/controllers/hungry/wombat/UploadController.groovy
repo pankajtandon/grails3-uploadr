@@ -27,29 +27,23 @@ class UploadController {
     }
 
     def warning() {
-        render(plugin: 'uploadr', template: '/upload/warning')
+        render(template: 'warning')
     }
 
     def handle() {
-        String contentType = request.getHeader("Content-Type")
-        String fileName = URLDecoder.decode(request.getHeader('X-File-Name'), 'UTF-8')
+        String fileName = header('X-File-Name')
         long fileSize = (request.getHeader('X-File-Size') != "undefined") ? request.getHeader('X-File-Size') as long : 0
-        String name = URLDecoder.decode(request.getHeader('X-Uploadr-Name'), 'UTF-8')
-        def info = session.getAttribute('uploadr')
-        def myInfo = (name && info && info.containsKey(name)) ? info[name] : [:]
+        String name = header('X-Uploadr-Name')
+        Map info = session.uploadr
+        Map myInfo = (name && info && info.containsKey(name)) ? info[name] : [:]
         String savePath = myInfo.path ?: "/tmp"
         def dir = new File(savePath)
-        def file = new File(savePath, fileName)
-        def namePart = ""
-        def extension = ""
-        def testName = ""
-        int status = 0
-        def statusText = ""
+        def file = new File(dir, fileName)
 
         response.contentType = 'application/json'
 
         // update lastUsed stamp in session
-        if (name && info && info.containsKey(name)) {
+        if (name && info?.containsKey(name)) {
             session.uploadr[name].lastUsed = new Date()
             session.uploadr[name].lastAction = "upload"
         }
@@ -58,22 +52,22 @@ class UploadController {
             try {
                 dir.mkdirs()
             } catch (e) {
-                response.sendError(500, "could not create upload path ${savePath}")
+                response.sendError(500, "could not create upload path $savePath")
                 render([written: false, fileName: file.name] as JSON)
                 return false
             }
         }
 
-        def freeSpace = dir.getUsableSpace()
+        long freeSpace = dir.usableSpace
         if (fileSize > freeSpace) {
-            response.sendError(500, "cannot store '${fileName}' (${fileSize} bytes), only ${freeSpace} bytes of free space left on device")
+            response.sendError(500, "cannot store '$fileName' ($fileSize bytes), only $freeSpace bytes of free space left on device")
             render([written: false, fileName: file.name] as JSON)
             return false
         }
 
         if (!dir.canWrite()) {
             if (!dir.setWritable(true)) {
-                response.sendError(500, "'${savePath}' is not writable, and unable to change rights")
+                response.sendError(500, "'$savePath' is not writable, and unable to change rights")
                 render([written: false, fileName: file.name] as JSON)
                 return false
             }
@@ -81,20 +75,19 @@ class UploadController {
 
         // make sure the file name is unique
         int dot = fileName.lastIndexOf(".")
-        namePart = (dot) ? fileName[0..dot - 1] : fileName
-        extension = (dot) ? fileName[dot + 1..fileName.length() - 1] : ""
+        String namePart = dot ? fileName[0..dot - 1] : fileName
+        String extension = dot ? fileName[dot + 1..fileName.length() - 1] : ""
         int testIterator = 1
         while (file.exists()) {
-            testName = "${namePart}-${testIterator}.${extension}"
-            file = new File(savePath, testName)
-            testIterator++
+            file = new File(savePath, "$namePart-${testIterator++}.$extension")
         }
 
         // handle file upload
+        int status = 200
+        String statusText
         try {
             FileCopyUtils.copy(request.inputStream, new FileOutputStream(file))
-            status = 200
-            statusText = "'${file.name}' upload successful!"
+            statusText = "'$file.name' upload successful!"
         } catch (e) {
             status = 500
             statusText = e.message
@@ -104,7 +97,7 @@ class UploadController {
         if (status == 200 && fileSize > file.size()) {
             // whoops, looks like the transfer was aborted!
             status = 500
-            statusText = "'${file.name}' transfer incomplete, received ${file.size()} of ${fileSize} bytes"
+            statusText = "'$file.name' transfer incomplete, received ${file.size()} of $fileSize bytes"
         }
 
         // got an error of some sorts?
@@ -117,19 +110,19 @@ class UploadController {
         }
 
         // render json response
-        response.setStatus(status)
+        response.status = status
         render([written: (status == 200), fileName: file.name, status: status, statusText: statusText] as JSON)
     }
 
     def delete() {
-        def fileName = URLDecoder.decode(request.getHeader('X-File-Name'), 'UTF-8')
-        def name = URLDecoder.decode(request.getHeader('X-Uploadr-Name'), 'UTF-8')
-        def info = session.getAttribute('uploadr')
-        def savePath = (name && info && info.get(name) && info.get(name).path) ? info.get(name).path : '/tmp'
+        String fileName = header('X-File-Name')
+        String name = header('X-Uploadr-Name')
+        Map info = session.uploadr
+        String savePath = (name && info && info[name]?.path) ? info[name].path : '/tmp'
         def file = new File(savePath, fileName)
 
         // update lastUsed stamp in session
-        if (name && info && info.containsKey(name)) {
+        if (name && info?.containsKey(name)) {
             session.uploadr[name].lastUsed = new Date()
             session.uploadr[name].lastAction = "delete"
         }
@@ -139,37 +132,39 @@ class UploadController {
                 // delete file
                 file.delete()
 
-                response.sendError(200, "OK, deleted '${fileName}'")
+                response.sendError(200, "OK, deleted '$fileName'")
             } catch (e) {
-                response.sendError(500, "could not delete '${fileName}' (${e.getMessage()}")
+                response.sendError(500, "could not delete '$fileName' ($e.message")
             }
         } else {
-            response.sendError(200, "OK, '${fileName}' did not -yet- exist")
+            response.sendError(200, "OK, '$fileName' did not -yet- exist")
         }
     }
 
     def download() {
-        def fileName = URLDecoder.decode(params.get('file'), 'UTF-8')
-        def name = URLDecoder.decode(params.get('uploadr'), 'UTF-8')
-        def info = session.getAttribute('uploadr')
-        def savePath = (name && info && info.get(name) && info.get(name).path) ? info.get(name).path : '/tmp'
+        String fileName = param('file')
+        String name = param('uploadr')
+        Map info = session.uploadr
+        String savePath = (name && info && info[name]?.path) ? info[name].path : '/tmp'
         def file = new File(savePath, fileName)
 
         // path traversal protection
-        if (file && file.exists() && fileName =~ /\\|\//) {
-            response.sendError(400, "could not download '${fileName}': access denied")
+        if (file?.exists() && fileName =~ /\\|\//) {
+            response.sendError(400, "could not download '$fileName': access denied")
             return false
-        } else if (file && file.exists() && file.canRead()) {
+        }
+
+        if (file?.exists() && file.canRead()) {
             // update lastUsed stamp in session
-            if (name && info && info.containsKey(name)) {
+            if (name && info?.containsKey(name)) {
                 session.uploadr[name].lastUsed = new Date()
                 session.uploadr[name].lastAction = "download"
             }
 
             // download file
-            response.setStatus(200)
-            response.setContentType("application/octet-stream")
-            response.setContentLength(file.size() as int)
+            response.status = 200
+            response.contentType = "application/octet-stream"
+            response.contentLength = file.size() as int
 
             // browsers do not handle RFC5987 properly, so Safari will be unable to decode the unicode filename
             // @see http://greenbytes.de/tech/tc2231/
@@ -183,15 +178,21 @@ class UploadController {
             }
         } else if (file?.exists() && !file.canRead()) {
             // file not readable
-            response.sendError(400, "could not download '${fileName}': access denied")
-            return false
+            response.sendError(400, "could not download '$fileName': access denied")
         } else {
             // file not found
-            response.sendError(400, "could not download '${fileName}': file not found")
-            return false
+            response.sendError(400, "could not download '$fileName': file not found")
         }
 
         // return false as we do not have a view
         return false
+    }
+
+    private param(String name) {
+        URLDecoder.decode params[name], 'UTF-8'
+    }
+
+    public header(String name) {
+        URLDecoder.decode request.getHeader(name), 'UTF-8'
     }
 }

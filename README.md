@@ -9,7 +9,7 @@ Grails 3 is based on Spring-Boot and plugins written pre-Grails 3 have to be "re
 This is an upgrade to grails 3.x of the excellent plugin written by Dustin Clark [here](https://github.com/dustindclark/grails-uploadr/blob/master/README.md)
 
 ## Usage
-In the project that you would like to use the uploadr plugin, include the following in it's build.gradle.
+In the project that you would like to use the uploadr plugin, include the following in its build.gradle.
 
 <pre>
 buildscript {
@@ -21,7 +21,7 @@ buildscript {
 }
 </pre>
 
-and 
+and
 
 <pre>
 dependencies {
@@ -33,37 +33,29 @@ dependencies {
 
 Then in a gsp where the uploadr needs to be installed:
 
-<pre>
-
-&lt;!DOCTYPE HTML&gt;
-&lt;html&gt;
-&lt;head&gt;
-    ...
-    &lt;asset:javascript src="uploadr.manifest.js"/&gt;
-    &lt;asset:javascript src="uploadr.demo.manifest.js"/&gt;
-    &lt;asset:stylesheet href="uploadr.manifest.css"/&gt;
-    &lt;asset:stylesheet href="uploadr.demo.manifest.css"/&gt;
-    ...
-&lt;/head&gt;
-&lt;body&gt;
-    ...
-    &lt;uploadr:demo/&gt;
-    ... 
-&lt;/body&gt;
-&lt;/html&gt;
-
-
-</pre>
-
+    <!DOCTYPE HTML>
+    <html>
+    <head>
+        ...
+        <asset:javascript src="uploadr.manifest.js"/>
+        <asset:javascript src="uploadr.demo.manifest.js"/>
+        <asset:stylesheet href="uploadr.manifest.css"/>
+        <asset:stylesheet href="uploadr.demo.manifest.css"/>
+        ...
+    </head>
+    <body>
+        ...
+        <uploadr:demo/>
+        ...
+    </body>
+    </html>
 
 ## Images
 
 When your gsp is configured with a tag like so:
- 
-`
-<uploadr:add name="aFileToUpload.png" path="/somewhereOnYourFS" maxSize="52428800" /> 
-`
- 
+
+    <uploadr:add name="aFileToUpload.png" path="/somewhereOnYourFS" maxSize="52428800" />
+
 Here is how a single file upload looks:
 
 ![uploadImage](uploadbefore.png)
@@ -75,4 +67,4 @@ and after upload...
 ## ToDo
 
 - i18n is still not working correctly, so all messages have been hardcoded in English.
- 
+
